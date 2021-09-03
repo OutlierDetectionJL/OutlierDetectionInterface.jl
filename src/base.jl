@@ -1,3 +1,12 @@
+
+"""
+Detector
+
+The union type of all detectors, including supervised, semi-supervised and unsupervised detectors. *Note:* A
+semi-supervised detector can be seen as a supervised detector with `missing` labels denoting unlabeled data.
+"""
+const Detector = MMI.Detector
+
 """
     UnsupervisedDetector
 
@@ -5,7 +14,7 @@ This abstract type forms the basis for all implemented unsupervised outlier dete
 `UnsupervisedDetector` yourself, you have to implement the `fit(detector, X)::Fit` and
 `score(detector, model, X)::Scores` methods. 
 """
-abstract type UnsupervisedDetector <: MMI.Unsupervised end
+const UnsupervisedDetector = MMI.UnsupervisedDetector
 
 """
     SupervisedDetector
@@ -14,24 +23,60 @@ This abstract type forms the basis for all implemented supervised outlier detect
 `SupervisedDetector` yourself, you have to implement the `fit(detector, X, y)::Fit` and
 `score(detector, model, X)::Scores` methods. 
 """
-abstract type SupervisedDetector <: MMI.Probabilistic end
+const SupervisedDetector = MMI.SupervisedDetector
 
 """
-    Detector::Union{<:SupervisedDetector, <:UnsupervisedDetector}
+    ProbabilisticDetector
 
-The union type of all implemented detectors, including supervised, semi-supervised and unsupervised detectors. *Note:* A
-semi-supervised detector can be seen as a supervised detector with `missing` labels denoting unlabeled data.
+The union type of all probabilistic detectors, that is, all detector with a [`predict`](@ref) method returning
+univariate finite distributions.
 """
-const Detector = Union{<:SupervisedDetector,<:UnsupervisedDetector}
+const ProbabilisticDetector = MMI.ProbabilisticDetector
 
 """
-    Model
+    ProbabilisticDetector
 
-A `Model` represents the learned behaviour for specific [`Detector`](@ref). This might include parameters in parametric
+The union type of all deterministic detectors, that is, all detector with a [`predict`](@ref) method returning
+categorical values.
+"""
+const DeterministicDetector = MMI.DeterministicDetector
+
+"""
+    ProbabilisticUnsupervisedDetector
+
+Unsupervised detectors with an additional [`predict`](@ref) method returning univariate finite distributions.
+"""
+const ProbabilisticUnsupervisedDetector = MMI.ProbabilisticUnsupervisedDetector
+
+"""
+    ProbabilisticSupervisedDetector
+
+Supervised detectors with an additional [`predict`](@ref) method returning univariate finite distributions.
+"""
+const ProbabilisticSupervisedDetector = MMI.ProbabilisticSupervisedDetector
+
+"""
+    DeterministicUnsupervisedDetector
+
+Unsupervised detectors with an additional [`predict`](@ref) method returning categorical values.
+"""
+const DeterministicUnsupervisedDetector = MMI.ProbabilisticSupervisedDetector
+
+"""
+    ProbabilisticSupervisedDetector
+
+Supervised detectors with an additional [`predict`](@ref) method returning categorical values.
+"""
+const ProbabilisticSupervisedDetector = MMI.ProbabilisticSupervisedDetector
+
+"""
+    DetectorModel
+
+A `DetectorModel` represents the learned behaviour for specific [`Detector`](@ref). This might include parameters in parametric
 models or other repesentations of the learned data in nonparametric models. In essence, it includes everything required
 to transform an instance to an outlier score.
 """
-abstract type Model end
+abstract type DetectorModel end
 
 """
     Score::AbstractVector{<:Real}
@@ -42,9 +87,9 @@ detectors return increasing scores and higher scores are associated with higher 
 const Scores = AbstractVector{<:Real}
 
 """
-    Label::AbstractVector{<:String}
+    Label::AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
 
-Labels are used for supervision and evaluation and are defined as an `AbstractArray{<:AbstractString}`. The convention
+Labels are used for supervision and evaluation and are defined as an (categorical) vectors of strings. The convention
 for labels is that `"outlier"` indicates outliers, `"normal"` indicates inliers and `missing` indicates unlabeled data.
 """
 # Labels may contain missing values, strings or categorical strings
@@ -161,6 +206,6 @@ Examples
 --------
 $(SCORE_UNSUPERVISED("KNNDetector"))
 """ # definition applies when X is not already an abstract array
-transform(_::Detector, _::Model, X::Data) = throw(DomainError(NO_DETECTOR("transform")))
-transform(_::Detector, _::Model, X) = throw(DomainError("Detectors can only predict with array inputs with one observation 
-per last dimension, found $(typeof(X))"))
+transform(_::Detector, _::DetectorModel, X::Data) = throw(DomainError(NO_DETECTOR("transform")))
+transform(_::Detector, _::DetectorModel, X) = throw(DomainError("Detectors can only predict with array inputs with one 
+observation per last dimension, found $(typeof(X))"))

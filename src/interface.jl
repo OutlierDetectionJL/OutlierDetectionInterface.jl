@@ -21,28 +21,20 @@ function MMI.transform(detector::Detector, model::Model, X)
     return scores
 end
 
-# helper to convert scores to univariate finite
-function to_univariate_finite(scores::Scores)
-    MMI.UnivariateFinite([CLASS_NORMAL, CLASS_OUTLIER], scores; augment=true, pool=missing, ordered=true)
-end
-
-# helper to convert classes to categorical values
-function to_categorical(classes::Labels)
-    # explicit cast to Vector{Union{String, Missing}} in case only missing values are passed
-    MMI.categorical(Vector{Union{String, Missing}}(classes), ordered=true, levels=[CLASS_NORMAL, CLASS_OUTLIER])
-end
-
 # specify scitypes
-MMI.input_scitype(::Type{<:Detector}) = MMI.Table(MMI.Continuous)
+MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous}, MMI.Table(MMI.Continuous)}
 MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{Missing,OrderedFactor{2}}}
 MMI.output_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 
 # data front-end for fit (supervised):
+MMI.reformat(::SupervisedDetector, X::Data, y) = (X, y)
+MMI.reformat(::SupervisedDetector, X::Data, y, w) = (X, y, w) 
 MMI.reformat(::SupervisedDetector, X, y) = (MMI.matrix(X, transpose=true), y)
 MMI.reformat(::SupervisedDetector, X, y, w) = (MMI.matrix(X, transpose=true), y, w) 
 MMI.selectrows(::SupervisedDetector, I, Xmatrix, y) = (view(Xmatrix, :, I), view(y, I))
 MMI.selectrows(::SupervisedDetector, I, Xmatrix, y, w) = (view(Xmatrix, :, I), view(y, I), view(w, I))
 
 # data front-end for fit (unsupervised)/predict/transform
+MMI.reformat(::Detector, X::Data) = (X,)
 MMI.reformat(::Detector, X) = (MMI.matrix(X, transpose=true),)
 MMI.selectrows(::Detector, I, Xmatrix) = (view(Xmatrix, :, I),)
