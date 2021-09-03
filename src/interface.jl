@@ -1,4 +1,4 @@
-assert_result(result) = @assert isa(result, Tuple{Model, Scores}) "`OutlierDetectionInterface.fit` must return a tuple
+assert_result(result) = @assert isa(result, Fit) "`OutlierDetectionInterface.fit` must return a tuple
  of `OutlierDetectionInterface.Model` and `OutlierDetectionInterface.Scores`"
 
 assert_scores(scores) = @assert isa(scores, Scores) "`OutlierDetectionInterface.transform` must return  
@@ -16,7 +16,7 @@ function MMI.fit(detector::SupervisedDetector, verbosity::Int, X, y)
     return model, nothing, (scores = scores,)
 end
 
-function MMI.transform(detector::Detector, model::Model, X)
+function MMI.transform(detector::Detector, model::DetectorModel, X)
     scores = transform(detector, model, X); assert_scores(scores);
     return scores
 end

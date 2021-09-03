@@ -33,7 +33,7 @@ module OutlierDetectionInterface
            Scores,
            Labels,
            Data,
-           Result
+           Fit
 
     # constants
     export CLASS_NORMAL,

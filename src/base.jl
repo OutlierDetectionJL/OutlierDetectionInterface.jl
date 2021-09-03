@@ -60,14 +60,14 @@ const ProbabilisticSupervisedDetector = MMI.ProbabilisticSupervisedDetector
 
 Unsupervised detectors with an additional [`predict`](@ref) method returning categorical values.
 """
-const DeterministicUnsupervisedDetector = MMI.ProbabilisticSupervisedDetector
+const DeterministicUnsupervisedDetector = MMI.DeterministicUnsupervisedDetector
 
 """
-    ProbabilisticSupervisedDetector
+    DeterministicSupervisedDetector
 
 Supervised detectors with an additional [`predict`](@ref) method returning categorical values.
 """
-const ProbabilisticSupervisedDetector = MMI.ProbabilisticSupervisedDetector
+const DeterministicSupervisedDetector = MMI.DeterministicSupervisedDetector
 
 """
     DetectorModel
@@ -103,6 +103,13 @@ in an n-dimensional array. It represents the input data used to [`fit`](@ref) a 
 [`score`](@ref) [`Data`](@ref).
 """
 const Data = Union{AbstractArray{<:Real}, SubArray{<:Real}}
+
+"""
+    Fit::Tuple{DetectorModel, Scores}
+
+A fit results in a learned model of type `DetectorModel` and the observed training scores of type `Scores`.
+"""
+const Fit = Tuple{DetectorModel, Scores}
 
 const DATA_ARGUMENT = """    X::AbstractArray{<:Real}
 An array of real values with one observation per last axis."""
@@ -192,7 +199,7 @@ Parameters
 ----------
 $DETECTOR_ARGUMENT
 
-    model::Model
+    model::DetectorModel
 The model learned from using [`fit`](@ref) with a supervised or unsupervised [`Detector`](@ref)
 
 $DATA_ARGUMENT
