@@ -4,14 +4,14 @@ assert_result(result) = @assert isa(result, Fit) "`OutlierDetectionInterface.fit
 assert_scores(scores) = @assert isa(scores, Scores) "`OutlierDetectionInterface.transform` must return  
 `OutlierDetectionInterface.Scores`"
 
-function MMI.fit(detector::UnsupervisedDetector, verbosity::Int, X)
-    result = fit(detector, X); assert_result(result);
+function MMI.fit(detector::UnsupervisedDetector, verbosity::Integer, X)
+    result = fit(detector, X; verbosity=verbosity); assert_result(result);
     model, scores = result
     return model, nothing, (scores = scores,)
 end
 
-function MMI.fit(detector::SupervisedDetector, verbosity::Int, X, y)
-    result = fit(detector, X, y); assert_result(result);
+function MMI.fit(detector::SupervisedDetector, verbosity::Integer, X, y)
+    result = fit(detector, X, y; verbosity=verbosity); assert_result(result);
     model, scores = result
     return model, nothing, (scores = scores,)
 end

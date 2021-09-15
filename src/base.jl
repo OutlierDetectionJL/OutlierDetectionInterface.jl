@@ -180,12 +180,13 @@ Examples
 --------
 $(SCORE_UNSUPERVISED("KNNDetector"))
 """ # those definitions apply when the type of X (or y) is not matching
-fit(_::UnsupervisedDetector, X::Data) = throw(DomainError(NO_DETECTOR("fit")))
-fit(_::UnsupervisedDetector, X::Data, y::Labels) = throw(DomainError(NO_DETECTOR("fit")))
-fit(_::UnsupervisedDetector, X) = throw(DomainError("Unsupervised detectors can only be fitted with array inputs 
-with one observation per last dimension, found $(typeof(X))"))
-fit(_::SupervisedDetector, X, y) = throw(DomainError("Supervised detectors can only be fitted with array inputs 
-with one observation per last dimension and `Labels`, found X=$(typeof(X)), y=$(typeof(y))"))
+# shorthand call syntax for raw outlier-detection api usage
+fit(::UnsupervisedDetector, X::Data; verbosity) = throw(DomainError(NO_DETECTOR("fit")))
+fit(::UnsupervisedDetector, X::Data, y::Labels; verbosity) = throw(DomainError(NO_DETECTOR("fit")))
+fit(::UnsupervisedDetector, X; verbosity) = throw(DomainError("Unsupervised detectors can only be fitted with array
+inputs with one observation per last dimension, found $(typeof(X))"))
+fit(::SupervisedDetector, X, y; verbosity) = throw(DomainError("Supervised detectors can only be fitted with array
+inputs with one observation per last dimension, found X=$(typeof(X)), y=$(typeof(y))"))
 
 """
     score(detector,
