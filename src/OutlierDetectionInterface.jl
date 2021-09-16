@@ -40,6 +40,9 @@ module OutlierDetectionInterface
            CLASS_OUTLIER,
            DEFAULT_THRESHOLD
 
+    # helpers
+    export ncolons
+
     # macros
     export @detector
 

@@ -25,16 +25,22 @@ end
 MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous}, MMI.Table(MMI.Continuous)}
 MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{Missing,OrderedFactor{2}}}
 MMI.output_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
+MMI.transform_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 
-# data front-end for fit (supervised):
-MMI.reformat(::SupervisedDetector, X::Data, y) = (X, y)
-MMI.reformat(::SupervisedDetector, X::Data, y, w) = (X, y, w) 
-MMI.reformat(::SupervisedDetector, X, y) = (MMI.matrix(X, transpose=true), y)
-MMI.reformat(::SupervisedDetector, X, y, w) = (MMI.matrix(X, transpose=true), y, w) 
-MMI.selectrows(::SupervisedDetector, I, Xmatrix, y) = (view(Xmatrix, :, I), view(y, I))
-MMI.selectrows(::SupervisedDetector, I, Xmatrix, y, w) = (view(Xmatrix, :, I), view(y, I), view(w, I))
-
-# data front-end for fit (unsupervised)/predict/transform
+# data front-end for predict/transform and fit (unsupervised)
 MMI.reformat(::Detector, X::Data) = (X,)
 MMI.reformat(::Detector, X) = (MMI.matrix(X, transpose=true),)
-MMI.selectrows(::Detector, I, Xmatrix) = (view(Xmatrix, :, I),)
+
+# data front-end for fit (semi-/supervised)
+MMI.reformat(::Detector, X::Data, y) = (X, y)
+MMI.reformat(::Detector, X::Data, y, w) = (X, y, w) 
+MMI.reformat(::Detector, X, y) = (MMI.matrix(X, transpose=true), y)
+MMI.reformat(::Detector, X, y, w) = (MMI.matrix(X, transpose=true), y, w) 
+
+# helper function to generate colons according to the data dimensionality
+ncolons(X::Data) = ntuple(_ -> Colon(), Val(ndims(X) - 1))
+
+# data front-end for row selection
+MMI.selectrows(::Detector, I, Xmatrix) = (view(Xmatrix, ncolons(Xmatrix)..., I),)
+MMI.selectrows(::Detector, I, Xmatrix, y) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I))
+MMI.selectrows(::Detector, I, Xmatrix, y, w) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I), view(w, I))
