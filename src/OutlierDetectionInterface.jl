@@ -20,13 +20,7 @@ module OutlierDetectionInterface
     # detector types
     export Detector,
            SupervisedDetector,
-           UnsupervisedDetector,
-           DeterministicDetector,
-           ProbabilisticDetector,
-           DeterministicSupervisedDetector,
-           DeterministicUnsupervisedDetector,
-           ProbabilisticSupervisedDetector,
-           ProbabilisticUnsupervisedDetector
+           UnsupervisedDetector
 
     # interface types
     export DetectorModel,
@@ -41,7 +35,7 @@ module OutlierDetectionInterface
            DEFAULT_THRESHOLD
 
     # helpers
-    export ncolons
+    export augmented_transform, ncolons
 
     # macros
     export @detector

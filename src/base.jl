@@ -1,6 +1,5 @@
-
 """
-Detector
+    Detector
 
 The union type of all detectors, including supervised, semi-supervised and unsupervised detectors. *Note:* A
 semi-supervised detector can be seen as a supervised detector with `missing` labels denoting unlabeled data.
@@ -10,64 +9,16 @@ const Detector = MMI.Detector
 """
     UnsupervisedDetector
 
-This abstract type forms the basis for all implemented unsupervised outlier detection algorithms. To implement a new
-`UnsupervisedDetector` yourself, you have to implement the `fit(detector, X)::Fit` and
-`score(detector, model, X)::Scores` methods. 
+This abstract type forms the basis for all implemented unsupervised outlier detection algorithms.
 """
 const UnsupervisedDetector = MMI.UnsupervisedDetector
 
 """
     SupervisedDetector
 
-This abstract type forms the basis for all implemented supervised outlier detection algorithms. To implement a new
-`SupervisedDetector` yourself, you have to implement the `fit(detector, X, y)::Fit` and
-`score(detector, model, X)::Scores` methods. 
+This abstract type forms the basis for all implemented supervised outlier detection algorithms.
 """
 const SupervisedDetector = MMI.SupervisedDetector
-
-"""
-    ProbabilisticDetector
-
-The union type of all probabilistic detectors, that is, all detector with a [`predict`](@ref) method returning
-univariate finite distributions.
-"""
-const ProbabilisticDetector = MMI.ProbabilisticDetector
-
-"""
-    ProbabilisticDetector
-
-The union type of all deterministic detectors, that is, all detector with a [`predict`](@ref) method returning
-categorical values.
-"""
-const DeterministicDetector = MMI.DeterministicDetector
-
-"""
-    ProbabilisticUnsupervisedDetector
-
-Unsupervised detectors with an additional [`predict`](@ref) method returning univariate finite distributions.
-"""
-const ProbabilisticUnsupervisedDetector = MMI.ProbabilisticUnsupervisedDetector
-
-"""
-    ProbabilisticSupervisedDetector
-
-Supervised detectors with an additional [`predict`](@ref) method returning univariate finite distributions.
-"""
-const ProbabilisticSupervisedDetector = MMI.ProbabilisticSupervisedDetector
-
-"""
-    DeterministicUnsupervisedDetector
-
-Unsupervised detectors with an additional [`predict`](@ref) method returning categorical values.
-"""
-const DeterministicUnsupervisedDetector = MMI.DeterministicUnsupervisedDetector
-
-"""
-    DeterministicSupervisedDetector
-
-Supervised detectors with an additional [`predict`](@ref) method returning categorical values.
-"""
-const DeterministicSupervisedDetector = MMI.DeterministicSupervisedDetector
 
 """
     DetectorModel
@@ -79,7 +30,7 @@ to transform an instance to an outlier score.
 abstract type DetectorModel end
 
 """
-    Score::AbstractVector{<:Real}
+    Scores::AbstractVector{<:Real}
 
 Scores are continuous values, where the range depends on the specific detector yielding the scores. *Note:* All
 detectors return increasing scores and higher scores are associated with higher outlierness.
@@ -87,20 +38,18 @@ detectors return increasing scores and higher scores are associated with higher 
 const Scores = AbstractVector{<:Real}
 
 """
-    Label::AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
+    Labels::AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
 
 Labels are used for supervision and evaluation and are defined as an (categorical) vectors of strings. The convention
 for labels is that `"outlier"` indicates outliers, `"normal"` indicates inliers and `missing` indicates unlabeled data.
 """
-# Labels may contain missing values, strings or categorical strings
 const Labels = AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
 
 """
     Data::AbstractArray{<:Real}
 
-The raw input data for every detector is defined as`AbstractArray{<:Real}` and should be a one observation per last axis
-in an n-dimensional array. It represents the input data used to [`fit`](@ref) a [`Detector`](@ref) and 
-[`score`](@ref) [`Data`](@ref).
+The raw input data for every detector is defined as`AbstractArray{<:Real}` and should be a one observation per last
+dimension in an n-dimensional array.
 """
 const Data = Union{AbstractArray{<:Real}, SubArray{<:Real}}
 
@@ -125,8 +74,8 @@ SCORE_UNSUPERVISED(name::String) = """
 using OutlierDetection: $name, fit, score
 detector = $name()
 X = rand(10, 100)
-model = fit(detector, X)
-train_scores, test_scores = score(detector, model, X)
+result = fit(detector, X)
+test_scores = transform(detector, result.model, X)
 ```"""
 
 SCORE_SUPERVISED(name::String) = """
@@ -157,9 +106,10 @@ extends `OutlierDetectionInterface.$method`"
 """
     fit(detector,
         X,
-        y)
+        y;
+        verbosity)
 
-Fit a specified unsupervised, supervised or semi-supervised outlier detector. That is, learn a `Model` from input data
+Fit an unsupervised, supervised or semi-supervised outlier detector. That is, learn a `DetectorModel` from input data
 `X` and, in the supervised and semi-supervised setting, labels `y`. In a supervised setting, the label `"outlier"`
 represents outliers and `"normal"` inliers. In a semi-supervised setting, `missing` additionally represents unlabeled
 data. *Note:* Unsupervised detectors can be fitted without specifying `y`.
@@ -179,8 +129,7 @@ achieved outlier scores of the given input data `X`.
 Examples
 --------
 $(SCORE_UNSUPERVISED("KNNDetector"))
-""" # those definitions apply when the type of X (or y) is not matching
-# shorthand call syntax for raw outlier-detection api usage
+"""
 fit(::UnsupervisedDetector, X::Data; verbosity) = throw(DomainError(NO_DETECTOR("fit")))
 fit(::UnsupervisedDetector, X::Data, y::Labels; verbosity) = throw(DomainError(NO_DETECTOR("fit")))
 fit(::UnsupervisedDetector, X; verbosity) = throw(DomainError("Unsupervised detectors can only be fitted with array
@@ -189,19 +138,19 @@ fit(::SupervisedDetector, X, y; verbosity) = throw(DomainError("Supervised detec
 inputs with one observation per last dimension, found X=$(typeof(X)), y=$(typeof(y))"))
 
 """
-    score(detector,
-          model,
-          X)
+    transform(detector,
+              model,
+              X)
 
 Transform input data `X` to outlier scores using an [`UnsupervisedDetector`](@ref) or [`SupervisedDetector`](@ref) and
-a corresponding [`Model`](@ref).
+a corresponding [`DetectorModel`](@ref).
 
 Parameters
 ----------
 $DETECTOR_ARGUMENT
 
     model::DetectorModel
-The model learned from using [`fit`](@ref) with a supervised or unsupervised [`Detector`](@ref)
+The model learned from using [`fit`](@ref) with a [`Detector`](@ref)
 
 $DATA_ARGUMENT
 
@@ -213,7 +162,7 @@ Tuple of the achieved outlier scores of the given train and test data.
 Examples
 --------
 $(SCORE_UNSUPERVISED("KNNDetector"))
-""" # definition applies when X is not already an abstract array
-transform(_::Detector, _::DetectorModel, X::Data) = throw(DomainError(NO_DETECTOR("transform")))
-transform(_::Detector, _::DetectorModel, X) = throw(DomainError("Detectors can only predict with array inputs with one 
+"""
+transform(::Detector, ::DetectorModel, X::Data) = throw(DomainError(NO_DETECTOR("transform")))
+transform(::Detector, ::DetectorModel, X) = throw(DomainError("Detectors can only predict with array inputs with one 
 observation per last dimension, found $(typeof(X))"))
