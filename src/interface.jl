@@ -21,12 +21,6 @@ function MMI.transform(detector::Detector, model::DetectorModel, X)
     return scores
 end
 
-function augmented_transform(detector::Detector, fitresult::Fit, X)
-    model, scores_train = fitresult
-    scores_test = MMI.transform(detector, model, X)
-    return scores_train, scores_test
-end
-
 # specify scitypes
 MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous}, MMI.Table(MMI.Continuous)}
 MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{Missing,OrderedFactor{2}}}

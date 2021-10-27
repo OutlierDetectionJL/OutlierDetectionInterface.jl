@@ -35,7 +35,7 @@ module OutlierDetectionInterface
            DEFAULT_THRESHOLD
 
     # helpers
-    export augmented_transform, ncolons
+    export ncolons
 
     # macros
     export @detector
