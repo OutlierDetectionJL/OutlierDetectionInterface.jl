@@ -27,20 +27,30 @@ MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{Missing,OrderedF
 MMI.output_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 MMI.transform_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 
-# data front-end for predict/transform and fit (unsupervised)
-MMI.reformat(::Detector, X::Data) = (X,)
-MMI.reformat(::Detector, X) = (MMI.matrix(X, transpose=true),)
-
-# data front-end for fit (semi-/supervised)
-MMI.reformat(::Detector, X::Data, y) = (X, y)
-MMI.reformat(::Detector, X::Data, y, w) = (X, y, w) 
-MMI.reformat(::Detector, X, y) = (MMI.matrix(X, transpose=true), y)
-MMI.reformat(::Detector, X, y, w) = (MMI.matrix(X, transpose=true), y, w) 
-
 # helper function to generate colons according to the data dimensionality
 ncolons(X::Data) = ntuple(_ -> Colon(), Val(ndims(X) - 1))
 
-# data front-end for row selection
-MMI.selectrows(::Detector, I, Xmatrix) = (view(Xmatrix, ncolons(Xmatrix)..., I),)
-MMI.selectrows(::Detector, I, Xmatrix, y) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I))
-MMI.selectrows(::Detector, I, Xmatrix, y, w) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I), view(w, I))
+macro default_frontend(detector)
+    detector = esc(detector)
+    return quote
+        MMI.reformat(::$detector, X::Data) = (X,)
+        MMI.reformat(::$detector, X::Data, y) = (X, y)
+        MMI.reformat(::$detector, X::Data, y, w) = (X, y, w) 
+        MMI.reformat(::$detector, X) = (MMI.matrix(X, transpose=true),)
+        MMI.reformat(::$detector, X, y) = (MMI.matrix(X, transpose=true), y)
+        MMI.reformat(::$detector, X, y, w) = (MMI.matrix(X, transpose=true), y, w)
+        MMI.selectrows(::$detector, I, Xmatrix) = (view(Xmatrix, ncolons(Xmatrix)..., I),)
+        MMI.selectrows(::$detector, I, Xmatrix, y) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I))
+        MMI.selectrows(::$detector, I, Xmatrix, y, w) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I), view(w, I))
+    end
+end
+
+macro default_metadata(detector, uuid::String)
+    detector = esc(detector)
+    quote
+        MMI.metadata_pkg($detector, package_name=string(@__MODULE__), package_uuid=$uuid,
+                        package_url="https://github.com/OutlierDetectionJL/$(@__MODULE__).jl",
+                        is_pure_julia=true, package_license="MIT", is_wrapper=false)
+        MMI.load_path(::Type{$detector}) = string($detector)
+    end
+end
