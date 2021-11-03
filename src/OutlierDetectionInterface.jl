@@ -9,9 +9,6 @@ module OutlierDetectionInterface
     const CLASS_OUTLIER = "outlier"
     const DEFAULT_THRESHOLD = 0.9
 
-    # we might customize this macro later
-    const var"@detector" = var"@mlj_model"
-
     # those do not get reexported from MLJModelInterface
     const _process_model_def = MMI._process_model_def
     const _model_constructor = MMI._model_constructor
@@ -38,7 +35,9 @@ module OutlierDetectionInterface
     export ncolons
 
     # macros
-    export @detector
+    export @detector,
+           @default_frontend,
+           @default_metadata
 
     # macro helpers
     export _process_model_def,
@@ -47,4 +46,5 @@ module OutlierDetectionInterface
 
     include("base.jl")
     include("interface.jl")
+    include("macros.jl")
 end
