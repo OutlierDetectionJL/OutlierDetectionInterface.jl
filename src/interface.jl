@@ -5,25 +5,28 @@ assert_scores(scores) = @assert isa(scores, Scores) "`OutlierDetectionInterface.
 `OutlierDetectionInterface.Scores`"
 
 function MMI.fit(detector::UnsupervisedDetector, verbosity::Integer, X)
-    result = fit(detector, X; verbosity=verbosity); assert_result(result);
+    result = fit(detector, X; verbosity = verbosity)
+    assert_result(result)
     model, scores = result
     return model, nothing, (scores = scores,)
 end
 
 function MMI.fit(detector::SupervisedDetector, verbosity::Integer, X, y)
-    result = fit(detector, X, y; verbosity=verbosity); assert_result(result);
+    result = fit(detector, X, y; verbosity = verbosity)
+    assert_result(result)
     model, scores = result
     return model, nothing, (scores = scores,)
 end
 
 function MMI.transform(detector::Detector, model::DetectorModel, X)
-    scores = transform(detector, model, X); assert_scores(scores);
+    scores = transform(detector, model, X)
+    assert_scores(scores)
     return scores
 end
 
 # specify scitypes
-MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous}, MMI.Table(MMI.Continuous)}
-MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{Missing,OrderedFactor{2}}}
+MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous},MMI.Table(MMI.Continuous)}
+MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:OrderedFactor{2}}
 MMI.output_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 MMI.transform_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 
