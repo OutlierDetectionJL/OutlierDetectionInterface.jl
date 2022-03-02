@@ -38,12 +38,12 @@ detectors return increasing scores and higher scores are associated with higher 
 const Scores = AbstractVector{<:Real}
 
 """
-    Labels::AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
+    Labels::AbstractVector{<:Union{Missing,<:T,CategoricalValue{<:T,<:Integer}}} where {T}
 
 Labels are used for supervision and evaluation and are defined as an (categorical) vectors of strings. The convention
 for labels is that `"outlier"` indicates outliers, `"normal"` indicates inliers and `missing` indicates unlabeled data.
 """
-const Labels = AbstractVector{<:Union{Missing, String, CategoricalValue{String, <:Integer}}}
+const Labels = AbstractVector{<:Union{Missing,<:T,CategoricalValue{<:T,<:Integer}}} where {T}
 
 """
     Data::AbstractArray{<:Real}
@@ -51,14 +51,14 @@ const Labels = AbstractVector{<:Union{Missing, String, CategoricalValue{String, 
 The raw input data for every detector is defined as`AbstractArray{<:Real}` and should be a one observation per last
 dimension in an n-dimensional array.
 """
-const Data = Union{AbstractArray{<:Real}, SubArray{<:Real}}
+const Data = AbstractArray{<:Real}
 
 """
     Fit::Tuple{DetectorModel, Scores}
 
 A fit results in a learned model of type `DetectorModel` and the observed training scores of type `Scores`.
 """
-const Fit = Tuple{DetectorModel, Scores}
+const Fit = Tuple{DetectorModel,Scores}
 
 const DATA_ARGUMENT = """    X::AbstractArray{<:Real}
 An array of real values with one observation per last axis."""
