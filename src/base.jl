@@ -38,12 +38,12 @@ detectors return increasing scores and higher scores are associated with higher 
 const Scores = AbstractVector{<:Real}
 
 """
-    Labels::AbstractVector{<:Union{Missing,<:T,CategoricalValue{<:T,<:Integer}}} where {T}
+    Labels::AbstractVector{<:Union{Missing,CategoricalValue{<:T,<:Integer}}} where {T}
 
 Labels are used for supervision and evaluation and are defined as an (categorical) vectors of strings. The convention
 for labels is that `"outlier"` indicates outliers, `"normal"` indicates inliers and `missing` indicates unlabeled data.
 """
-const Labels = AbstractVector{<:Union{Missing,<:T,CategoricalValue{<:T,<:Integer}}} where {T}
+const Labels = AbstractVector{<:Union{Missing,CategoricalValue{<:T,<:Integer}}} where {T}
 
 """
     Data::AbstractArray{<:Real}
