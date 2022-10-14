@@ -135,7 +135,7 @@ fit(::UnsupervisedDetector, X::Data, y::Labels; verbosity) = throw(DomainError(N
 fit(::UnsupervisedDetector, X; verbosity) = throw(DomainError("Unsupervised detectors can only be fitted with array
 inputs with one observation per last dimension, found $(typeof(X))"))
 fit(::SupervisedDetector, X, y; verbosity) = throw(DomainError("Supervised detectors can only be fitted with array
-inputs with one observation per last dimension, found X=$(typeof(X)), y=$(typeof(y))"))
+inputs with one observation per last dimension and categorical labels, found X=$(typeof(X)), y=$(typeof(y))"))
 
 """
     transform(detector,

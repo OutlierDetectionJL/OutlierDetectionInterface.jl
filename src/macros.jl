@@ -25,11 +25,13 @@ macro default_frontend(detector)
     detector = esc(detector)
     return quote
         MMI.reformat(::$detector, X::Data) = (X,)
-        MMI.reformat(::$detector, X::Data, y) = (X, y)
-        MMI.reformat(::$detector, X::Data, y, w) = (X, y, w) 
+        MMI.reformat(::$detector, X::Data, y::Labels) = (X, y)
+        MMI.reformat(::$detector, X::Data, y::Labels, w) = (X, y, w)
+
         MMI.reformat(::$detector, X) = (MMI.matrix(X, transpose=true),)
-        MMI.reformat(::$detector, X, y) = (MMI.matrix(X, transpose=true), y)
-        MMI.reformat(::$detector, X, y, w) = (MMI.matrix(X, transpose=true), y, w)
+        MMI.reformat(::$detector, X, y::Labels) = (MMI.matrix(X, transpose=true), y)
+        MMI.reformat(::$detector, X, y::Labels, w) = (MMI.matrix(X, transpose=true), y, w)
+
         MMI.selectrows(::$detector, I, Xmatrix) = (view(Xmatrix, ncolons(Xmatrix)..., I),)
         MMI.selectrows(::$detector, I, Xmatrix, y) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I))
         MMI.selectrows(::$detector, I, Xmatrix, y, w) = (view(Xmatrix, ncolons(Xmatrix)..., I), view(y, I), view(w, I))
