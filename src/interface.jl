@@ -26,7 +26,7 @@ end
 
 # specify scitypes
 MMI.input_scitype(::Type{<:Detector}) = Union{AbstractMatrix{<:MMI.Continuous},MMI.Table(MMI.Continuous)}
-MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:OrderedFactor{2}}
+MMI.target_scitype(::Type{<:Detector}) = AbstractVector{<:Union{OrderedFactor{2},Missing}}
 MMI.output_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 MMI.transform_scitype(::Type{<:Detector}) = AbstractVector{<:MMI.Continuous}
 
