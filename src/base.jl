@@ -71,11 +71,11 @@ Any [`UnsupervisedDetector`](@ref) or [`SupervisedDetector`](@ref) implementatio
 
 SCORE_UNSUPERVISED(name::String) = """
 ```julia
-using OutlierDetection: $name, fit, score
+using OutlierDetection: $name, fit, transform
 detector = $name()
 X = rand(10, 100)
-result = fit(detector, X)
-test_scores = transform(detector, result.model, X)
+model, result = fit(detector, X; verbosity=0)
+test_scores = transform(detector, model, X)
 ```"""
 
 SCORE_SUPERVISED(name::String) = """
@@ -84,7 +84,7 @@ using OutlierDetection: $name, fit, score
 detector = $name()
 X = rand(10, 100)
 y = rand([-1,1], 100)
-model = fit(detector, X, y)
+model = fit(detector, X, y; verbosity=0)
 train_scores, test_scores = score(detector, model, X)
 ```"""
 
