@@ -1,7 +1,7 @@
 name = "OutlierDetectionInterface"
 uuid = "1722ece6-f894-4ffc-b6be-6ca1174e2011"
 authors = ["David Muhr <muhrdavid@gmail.com> and contributors"]
-version = "0.1.9"
+version = "0.1.10"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
