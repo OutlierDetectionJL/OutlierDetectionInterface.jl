@@ -60,6 +60,16 @@ A fit results in a learned model of type `T <: Any` and the observed training sc
 """
 const Fit = Tuple{T,Scores} where {T}
 
+"""
+    FitResult
+
+A structured fit result used as a fit return type MLJ bundling a model and the observed training scores of type `Scores`.
+"""
+struct FitResult
+    model
+    scores:: Scores
+end
+
 const DATA_ARGUMENT = """    X::AbstractArray{<:Real}
 An array of real values with one observation per last axis."""
 
