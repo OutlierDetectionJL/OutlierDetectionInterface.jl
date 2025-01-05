@@ -67,6 +67,8 @@ macro default_metadata(detector, uuid::String)
         MMI.metadata_pkg($detector, package_name=string(@__MODULE__), package_uuid=$uuid,
                         package_url="https://github.com/OutlierDetectionJL/$(@__MODULE__).jl",
                         is_pure_julia=true, package_license="MIT", is_wrapper=false)
-        MMI.load_path(::Type{$detector}) = string($detector)
+        # ensure the load path is absolute (that's a requirement of MLJ). if 'MyDetector' is imported from
+        # from 'OutlierDetectionPackage', then the load path should be 'OutlierDetectionPackage.MyDetector'
+        MMI.load_path(::Type{$detector}) = occursin(".", string($detector)) ? string($detector) : string(@__MODULE__, ".", $detector)
     end
 end
